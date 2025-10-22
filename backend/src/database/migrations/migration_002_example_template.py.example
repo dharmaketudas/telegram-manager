@@ -1,0 +1,356 @@
+"""
+Migration 002: Example Template (RENAME THIS FILE)
+This is an example migration file showing best practices for creating database migrations.
+
+INSTRUCTIONS:
+1. Copy this file and rename it (remove .example extension)
+2. Update the version number (002 -> your next sequential number)
+3. Update the class name and description
+4. Implement your up() and down() methods
+5. Register the migration in __init__.py
+
+What this example does:
+- Adds a new 'contact_notes' table for storing notes about contacts
+- Adds an index for performance
+- Shows how to do a data migration
+- Demonstrates proper error handling and logging
+"""
+
+import logging
+from . import Migration
+from ..connection import DatabaseConnection
+
+logger = logging.getLogger(__name__)
+
+
+class ExampleMigration(Migration):
+    """
+    Example migration showing best practices
+
+    RENAME THIS CLASS to match your migration purpose, e.g.:
+    - AddContactNotesMigration
+    - AddUserPreferencesMigration
+    - UpdateMessageStatusMigration
+    """
+
+    def __init__(self):
+        super().__init__(
+            version="002",  # INCREMENT THIS for each new migration
+            name="example_template",  # CHANGE THIS to match your migration
+            description="Example migration template showing best practices"
+        )
+
+    async def up(self, db: DatabaseConnection):
+        """
+        Apply the migration
+
+        This method is called when running migrations forward.
+        It should contain all the changes you want to make to the database.
+        """
+        logger.info("Starting example migration...")
+
+        # ==========================================
+        # STEP 1: Create new table(s)
+        # ==========================================
+        logger.info("Creating contact_notes table...")
+
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS contact_notes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                contact_id INTEGER NOT NULL,
+                note_text TEXT NOT NULL,
+                is_important BOOLEAN DEFAULT 0,
+                created_by TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (contact_id) REFERENCES contacts(id) ON DELETE CASCADE
+            );
+        """)
+
+        logger.info("✓ Created contact_notes table")
+
+        # ==========================================
+        # STEP 2: Create indexes for performance
+        # ==========================================
+        logger.info("Creating indexes...")
+
+        await db.execute("""
+            CREATE INDEX IF NOT EXISTS idx_contact_notes_contact_id
+            ON contact_notes(contact_id);
+        """)
+
+        await db.execute("""
+            CREATE INDEX IF NOT EXISTS idx_contact_notes_is_important
+            ON contact_notes(is_important)
+            WHERE is_important = 1;
+        """)
+
+        logger.info("✓ Created indexes")
+
+        # ==========================================
+        # STEP 3: Create triggers (if needed)
+        # ==========================================
+        logger.info("Creating triggers...")
+
+        await db.execute("""
+            CREATE TRIGGER IF NOT EXISTS update_contact_notes_timestamp
+            AFTER UPDATE ON contact_notes
+            FOR EACH ROW
+            BEGIN
+                UPDATE contact_notes
+                SET updated_at = CURRENT_TIMESTAMP
+                WHERE id = NEW.id;
+            END;
+        """)
+
+        logger.info("✓ Created triggers")
+
+        # ==========================================
+        # STEP 4: Modify existing tables (if needed)
+        # ==========================================
+        # Example: Adding a column to an existing table
+        # Note: SQLite has limited ALTER TABLE support
+
+        # Check if column already exists before adding
+        cursor = await db.execute("""
+            PRAGMA table_info(contacts)
+        """)
+        columns = await cursor.fetchall()
+        column_names = [col[1] for col in columns]
+
+        if 'last_contacted_at' not in column_names:
+            logger.info("Adding last_contacted_at column to contacts table...")
+            await db.execute("""
+                ALTER TABLE contacts
+                ADD COLUMN last_contacted_at TIMESTAMP;
+            """)
+            logger.info("✓ Added last_contacted_at column")
+        else:
+            logger.info("Column last_contacted_at already exists, skipping...")
+
+        # ==========================================
+        # STEP 5: Data migration (if needed)
+        # ==========================================
+        # Example: Populate new field based on existing data
+        logger.info("Migrating existing data...")
+
+        # Get total count for progress tracking
+        result = await db.fetch_one("SELECT COUNT(*) FROM contacts")
+        total_contacts = result[0] if result else 0
+
+        if total_contacts > 0:
+            logger.info(f"Processing {total_contacts} contacts...")
+
+            # Process in batches for better performance
+            batch_size = 100
+            offset = 0
+            processed = 0
+
+            while offset < total_contacts:
+                # Fetch batch of contacts
+                contacts = await db.fetch_all(
+                    f"SELECT id, telegram_id FROM contacts LIMIT {batch_size} OFFSET {offset}"
+                )
+
+                # Process each contact in the batch
+                for contact in contacts:
+                    contact_id = contact[0]
+
+                    # Example: Create a default note for existing contacts
+                    # (You would replace this with your actual data migration logic)
+                    await db.execute("""
+                        INSERT INTO contact_notes (contact_id, note_text, created_by)
+                        VALUES (?, ?, ?)
+                    """, (contact_id, "Imported from legacy system", "system"))
+
+                    processed += 1
+
+                offset += batch_size
+
+                # Log progress every 1000 records
+                if processed % 1000 == 0:
+                    logger.info(f"Processed {processed}/{total_contacts} contacts...")
+
+            logger.info(f"✓ Migrated data for {processed} contacts")
+        else:
+            logger.info("No existing contacts to migrate")
+
+        # ==========================================
+        # STEP 6: Commit all changes
+        # ==========================================
+        await db.commit()
+
+        logger.info("✓ Example migration completed successfully")
+
+    async def down(self, db: DatabaseConnection):
+        """
+        Rollback the migration
+
+        This method is called when rolling back migrations.
+        It should undo everything that up() does, in reverse order.
+
+        IMPORTANT: Make sure this truly reverses all changes!
+        """
+        logger.warning("Rolling back example migration...")
+
+        # ==========================================
+        # Rollback in REVERSE order of up()
+        # ==========================================
+
+        # STEP 1: Remove added column (if possible in SQLite)
+        # Note: SQLite doesn't support DROP COLUMN in older versions
+        # You may need to recreate the table without the column
+        logger.info("Removing last_contacted_at column...")
+        # This is complex in SQLite, so we'll skip for this example
+        # In production, you'd need to:
+        # 1. Create new table without the column
+        # 2. Copy data to new table
+        # 3. Drop old table
+        # 4. Rename new table
+        logger.info("Column removal skipped (SQLite limitation)")
+
+        # STEP 2: Drop triggers
+        logger.info("Dropping triggers...")
+        await db.execute("DROP TRIGGER IF EXISTS update_contact_notes_timestamp")
+        logger.info("✓ Dropped triggers")
+
+        # STEP 3: Drop indexes
+        logger.info("Dropping indexes...")
+        await db.execute("DROP INDEX IF EXISTS idx_contact_notes_contact_id")
+        await db.execute("DROP INDEX IF EXISTS idx_contact_notes_is_important")
+        logger.info("✓ Dropped indexes")
+
+        # STEP 4: Drop tables
+        logger.info("Dropping contact_notes table...")
+        await db.execute("DROP TABLE IF EXISTS contact_notes")
+        logger.info("✓ Dropped contact_notes table")
+
+        # STEP 5: Commit rollback
+        await db.commit()
+
+        logger.warning("✓ Example migration rolled back successfully")
+
+
+# ==========================================
+# ADDITIONAL EXAMPLES
+# ==========================================
+
+class SimpleTableAdditionMigration(Migration):
+    """Example: Simple table addition"""
+
+    def __init__(self):
+        super().__init__(
+            version="003",
+            name="simple_table_addition",
+            description="Simple example of adding a table"
+        )
+
+    async def up(self, db: DatabaseConnection):
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS user_settings (
+                user_id INTEGER PRIMARY KEY,
+                theme TEXT DEFAULT 'light',
+                notifications_enabled BOOLEAN DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+        await db.commit()
+        logger.info("✓ Added user_settings table")
+
+    async def down(self, db: DatabaseConnection):
+        await db.execute("DROP TABLE IF EXISTS user_settings")
+        await db.commit()
+        logger.info("✓ Removed user_settings table")
+
+
+class AddIndexMigration(Migration):
+    """Example: Adding an index to existing table"""
+
+    def __init__(self):
+        super().__init__(
+            version="004",
+            name="add_message_index",
+            description="Add index to improve message query performance"
+        )
+
+    async def up(self, db: DatabaseConnection):
+        await db.execute("""
+            CREATE INDEX IF NOT EXISTS idx_messages_contact_timestamp
+            ON messages(contact_id, timestamp DESC);
+        """)
+        await db.commit()
+        logger.info("✓ Added composite index on messages")
+
+    async def down(self, db: DatabaseConnection):
+        await db.execute("DROP INDEX IF EXISTS idx_messages_contact_timestamp")
+        await db.commit()
+        logger.info("✓ Removed composite index")
+
+
+class DataMigrationOnlyMigration(Migration):
+    """Example: Data migration without schema changes"""
+
+    def __init__(self):
+        super().__init__(
+            version="005",
+            name="normalize_phone_numbers",
+            description="Normalize all phone numbers to international format"
+        )
+
+    async def up(self, db: ConnectionDatabase):
+        logger.info("Normalizing phone numbers...")
+
+        # Fetch all contacts with phone numbers
+        contacts = await db.fetch_all("""
+            SELECT id, phone FROM contacts
+            WHERE phone IS NOT NULL AND phone != ''
+        """)
+
+        updated = 0
+        for contact in contacts:
+            contact_id, phone = contact
+
+            # Example: Add '+' prefix if missing
+            if not phone.startswith('+'):
+                normalized = '+' + phone.lstrip('0')
+                await db.execute(
+                    "UPDATE contacts SET phone = ? WHERE id = ?",
+                    (normalized, contact_id)
+                )
+                updated += 1
+
+        await db.commit()
+        logger.info(f"✓ Normalized {updated} phone numbers")
+
+    async def down(self, db: DatabaseConnection):
+        # Data migrations often can't be perfectly reversed
+        logger.warning("Phone number normalization cannot be reversed")
+        logger.warning("Original formats were not preserved")
+
+
+# ==========================================
+# MIGRATION BEST PRACTICES CHECKLIST
+# ==========================================
+"""
+✅ DO:
+- Use IF NOT EXISTS for tables and indexes
+- Use descriptive migration names
+- Log progress for long-running operations
+- Process data in batches for large datasets
+- Test both up() and down() methods
+- Handle errors gracefully
+- Document what the migration does
+- Keep migrations focused (one purpose per migration)
+- Use transactions (commit at the end)
+- Version migrations sequentially
+
+❌ DON'T:
+- Modify migrations after they've been applied
+- Delete migration files
+- Make multiple unrelated changes in one migration
+- Forget to implement down() method
+- Hardcode values that should be configurable
+- Run long operations without progress logging
+- Forget to commit changes
+- Reuse version numbers
+"""
