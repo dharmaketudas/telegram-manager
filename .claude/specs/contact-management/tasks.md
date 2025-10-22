@@ -24,7 +24,7 @@
   - Add property methods for computed fields (e.g., full_name on Contact)
   - _Requirements: 1.4, 2.1, 2.4, 2.5, 3.4_
 
-- [ ] 4. Implement Pydantic schemas for API requests and responses
+- [x] 4. Implement Pydantic schemas for API requests and responses
   - Create schemas/contact.py with ContactResponse, ContactProfileResponse, GroupInfo, MessageInfo schemas
   - Create schemas/tag.py with TagCreate, TagUpdate, TagResponse schemas
   - Create schemas/message.py with SendMessageRequest, BulkMessageRequest, MessageResult, BulkMessageJob, BulkMessageStatus schemas

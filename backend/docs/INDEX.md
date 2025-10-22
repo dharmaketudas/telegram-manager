@@ -101,6 +101,13 @@ Guides for developers working on the codebase.
   - Type conversions and patterns
   - Usage examples and best practices
 
+### API Schemas
+- **[API Schemas Documentation](./api-schemas.md)** - Complete guide to Pydantic schemas
+  - Request and response schemas
+  - Validation rules and examples
+  - Contact, Tag, Message, and Auth schemas
+  - Type conversion patterns
+
 ---
 
 ## 🐛 Troubleshooting & Fixes
@@ -175,6 +182,9 @@ backend/
 #### ...understand the data models
 → Read [Domain Models Documentation](./domain-models.md)
 
+#### ...understand the API schemas
+→ Read [API Schemas Documentation](./api-schemas.md)
+
 #### ...create a new database migration
 → Read [Migration Quick Reference](./migrations-quick-reference.md)
 
@@ -205,6 +215,7 @@ backend/
 | Development Workflow | ✅ Complete | 2024 |
 | Technical Implementation | ✅ Complete | 2024 |
 | Domain Models | ✅ Complete | 2024 |
+| API Schemas | ✅ Complete | 2024 |
 | Import Issues Resolution | ✅ Complete | 2024 |
 
 ---
