@@ -94,6 +94,13 @@ Guides for developers working on the codebase.
   - Design patterns used
   - Performance considerations
 
+### Domain Models
+- **[Domain Models Documentation](./domain-models.md)** - Complete guide to data models
+  - Contact, Group, Tag, and Message models
+  - ContactProfile aggregated view
+  - Type conversions and patterns
+  - Usage examples and best practices
+
 ---
 
 ## 🐛 Troubleshooting & Fixes
@@ -165,6 +172,9 @@ backend/
 #### ...understand the database schema
 → Read [Database Schema](./database-schema.md)
 
+#### ...understand the data models
+→ Read [Domain Models Documentation](./domain-models.md)
+
 #### ...create a new database migration
 → Read [Migration Quick Reference](./migrations-quick-reference.md)
 
@@ -194,6 +204,7 @@ backend/
 | Migration Quick Reference | ✅ Complete | 2024 |
 | Development Workflow | ✅ Complete | 2024 |
 | Technical Implementation | ✅ Complete | 2024 |
+| Domain Models | ✅ Complete | 2024 |
 | Import Issues Resolution | ✅ Complete | 2024 |
 
 ---

@@ -16,7 +16,7 @@
   - Write unit tests for database connection and schema creation
   - _Requirements: 1.4, 2.1, 3.3, 7.1_
 
-- [ ] 3. Create domain models and data classes
+- [x] 3. Create domain models and data classes
   - Create models/contact.py with Contact dataclass including id, telegram_id, username, first_name, last_name, display_name, phone, profile_photo_path, bio, timestamps
   - Create models/group.py with Group dataclass including id, telegram_id, name, member_count, profile_photo_path, timestamps
   - Create models/tag.py with Tag dataclass including id, name, color, created_at
