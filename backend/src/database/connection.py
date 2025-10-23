@@ -10,7 +10,7 @@ from typing import Optional
 from contextlib import asynccontextmanager
 import logging
 
-from config import get_settings
+from src.config import get_settings
 
 logger = logging.getLogger(__name__)
 

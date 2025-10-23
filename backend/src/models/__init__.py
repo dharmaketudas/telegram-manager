@@ -6,7 +6,7 @@ of the application. These models are used throughout the application for
 data transfer and business logic.
 """
 
-from .contact import Contact, ContactProfile
+from .contact import Contact
 from .group import Group
 from .tag import Tag
 from .message import Message

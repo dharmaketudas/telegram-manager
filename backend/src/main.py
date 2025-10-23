@@ -10,8 +10,8 @@ import os
 import logging
 from pathlib import Path
 
-from database import init_database, close_database, run_migrations, verify_schema
-from config import get_settings
+from src.database.connection import init_database, close_database
+from src.config import get_settings
 
 # Configure logging
 logging.basicConfig(
@@ -62,28 +62,15 @@ async def startup_event():
     # Get application settings
     settings = get_settings()
 
-    # Ensure directories exist
-    settings.ensure_directories_exist()
+    # Create data directories if they don't exist
+    media_path = Path("./data/media")
+    media_path.mkdir(parents=True, exist_ok=True)
     logger.info("Data directories created/verified")
 
     # Initialize database connection
     try:
-        db = await init_database()
-        logger.info("Database connection established")
-
-        # Run migrations to create/update schema
-        migration_success = await run_migrations(db)
-        if not migration_success:
-            logger.error("Database migrations failed!")
-        else:
-            logger.info("Database migrations completed successfully")
-
-        # Verify schema
-        schema_valid = await verify_schema(db)
-        if schema_valid:
-            logger.info("Database schema verification passed")
-        else:
-            logger.warning("Database schema verification failed")
+        await init_database()
+        logger.info("Database connection established and initialized")
 
     except Exception as e:
         logger.error(f"Error initializing database: {e}")
