@@ -108,6 +108,14 @@ Guides for developers working on the codebase.
   - Contact, Tag, Message, and Auth schemas
   - Type conversion patterns
 
+### Repositories
+- **[Tag Repository Documentation](./repositories-tag-repository.md)** - Complete guide to TagRepository
+  - CRUD operations for tags
+  - Many-to-many relationship management
+  - Contact-tag associations
+  - Usage examples and best practices
+  - Performance optimization
+
 ---
 
 ## 🐛 Troubleshooting & Fixes
@@ -185,6 +193,9 @@ backend/
 #### ...understand the API schemas
 → Read [API Schemas Documentation](./api-schemas.md)
 
+#### ...work with tags and contact organization
+→ Read [Tag Repository Documentation](./repositories-tag-repository.md)
+
 #### ...create a new database migration
 → Read [Migration Quick Reference](./migrations-quick-reference.md)
 
@@ -216,6 +227,7 @@ backend/
 | Technical Implementation | ✅ Complete | 2024 |
 | Domain Models | ✅ Complete | 2024 |
 | API Schemas | ✅ Complete | 2024 |
+| Tag Repository | ✅ Complete | 2024 |
 | Import Issues Resolution | ✅ Complete | 2024 |
 
 ---

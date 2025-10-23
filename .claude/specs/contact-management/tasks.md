@@ -39,7 +39,7 @@
   - Write unit tests for all repository methods using in-memory SQLite database
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 4.1, 4.3_
 
-- [ ] 6. Build Tag Repository with many-to-many relationship management
+- [x] 6. Build Tag Repository with many-to-many relationship management
   - Create repositories/tag_repository.py with TagRepository class
   - Implement create, get_by_id, get_by_name, get_all, update, delete methods for tags
   - Implement get_tags_for_contact, add_tag_to_contact, remove_tag_from_contact methods for associations
